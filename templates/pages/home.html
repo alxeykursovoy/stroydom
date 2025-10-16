@@ -1,20 +1,58 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Добро пожаловать в СтройДом!</h1>
-<p>Лучшие дома и бани для вашего участка</p>
-<div class="row">
-    <div class="col-md-4">
-        <h3>Дома</h3>
-        <p>Качественные дома под ключ</p>
+<div class="text-center mb-5 py-4 bg-light rounded">
+    <h1 class="display-4 text-dark fw-bold">СтройДом</h1>
+    <p class="lead text-muted fs-3">Ваш дом мечты - наша реальность!</p>
+    <p class="text-dark">Строим качественно, сдаём в срок</p>
+</div>
+
+<div id="mainSlider" class="carousel slide mb-5 shadow rounded" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#mainSlider" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#mainSlider" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#mainSlider" data-bs-slide-to="2"></button>
     </div>
-    <div class="col-md-4">
-        <h3>Бани</h3>
-        <p>Традиционные русские бани</p>
+    
+    <div class="carousel-inner rounded">
+        <div class="carousel-item active">
+            <div class="d-block w-100 bg-primary text-white py-5" style="height: 400px;">
+                <div class="carousel-caption d-none d-md-block">
+                    <h2>Современные дома</h2>
+                    <p>Проекты любой сложности под ключ</p>
+                    <a href="{% url 'catalog' %}" class="btn btn-light btn-lg">Смотреть каталог</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="carousel-item">
+            <div class="d-block w-100 bg-success text-white py-5" style="height: 400px;">
+                <div class="carousel-caption d-none d-md-block">
+                    <h2>Русские бани</h2>
+                    <p>Традиционные технологии и современный комфорт</p>
+                    <a href="{% url 'catalog' %}" class="btn btn-light btn-lg">Выбрать баню</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="carousel-item">
+            <div class="d-block w-100 bg-warning text-dark py-5" style="height: 400px;">
+                <div class="carousel-caption d-none d-md-block">
+                    <h2>Уютные беседки</h2>
+                    <p>Идеальное место для отдыха с семьёй и друзьями</p>
+                    <a href="{% url 'catalog' %}" class="btn btn-dark btn-lg">Посмотреть варианты</a>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-md-4">
-        <h3>Беседки</h3>
-        <p>Уютные места для отдыха</p>
-    </div>
+    
+    <button class="carousel-control-prev" type="button" data-bs-target="#mainSlider" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+        <span class="visually-hidden">Предыдущий</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#mainSlider" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+        <span class="visually-hidden">Следующий</span>
+    </button>
 </div>
 {% endblock %}
