@@ -3,78 +3,110 @@
 {% block content %}
 <div class="row">
     <div class="col-md-6">
-        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded shadow" style="max-height: 500px; width: 100%; object-fit: cover;">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded shadow" 
+             style="max-height: 500px; width: 100%; object-fit: cover; border: 3px solid #e74c3c;">
+        {% else %}
+        <div class="d-flex align-items-center justify-content-center bg-light rounded shadow" 
+             style="height: 500px; border: 3px solid #e74c3c;">
+            <span class="text-muted fs-4"> Нет изображения</span>
+        </div>
+        {% endif %}
     </div>
+    
     <div class="col-md-6">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'catalog' %}">Каталог</a></li>
-                <li class="breadcrumb-item active">{{ product.name }}</li>
+                <li class="breadcrumb-item"><a href="{% url 'home' %}" style="color: #e74c3c;">Главная</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'catalog' %}" style="color: #e74c3c;">Каталог</a></li>
+                <li class="breadcrumb-item active fw-bold">{{ product.name }}</li>
             </ol>
         </nav>
 
-        <h1 class="display-5">{{ product.name }}</h1>
-        <p class="lead">{{ product.description }}</p>
+        <h1 class="display-5 fw-bold" style="color: #2c3e50;">{{ product.name }}</h1>
+        <p class="lead text-muted">{{ product.description }}</p>
         
         <div class="mb-4">
-            <span class="h2 text-primary">{{ product.price }} ₽</span>
-            <span class="badge bg-success fs-6 ms-2">В наличии</span>
+            <span class="h1 fw-bold" style="color: #e74c3c;">{{ product.price }} ₽</span>
+            <span class="badge fs-6 ms-2" style="background-color: #27ae60; padding: 10px 15px;">В наличии</span>
         </div>
 
         <!-- Характеристики -->
-        <div class="card mb-4">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">📋 Характеристики</h5>
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-header text-white" style="background-color: #2c3e50;">
+                <h5 class="mb-0 fw-bold"> Характеристики</h5>
             </div>
             <div class="card-body">
                 <table class="table table-borderless">
                     <tr>
-                        <td><strong>Модель:</strong></td>
+                        <td class="fw-bold" style="color: #2c3e50;">Модель:</td>
                         <td>{{ product.model }}</td>
                     </tr>
                     <tr>
-                        <td><strong>Страна-производитель:</strong></td>
-                        <td>{{ product.get_country_display }}</td>
+                        <td class="fw-bold" style="color: #2c3e50;">Страна-производитель:</td>
+                        <td>
+                            <span class="badge" style="background-color: #3498db;">
+                                {{ product.get_country_display }}
+                            </span>
+                        </td>
                     </tr>
                     <tr>
-                        <td><strong>Год выпуска:</strong></td>
-                        <td>{{ product.production_year }}</td>
+                        <td class="fw-bold" style="color: #2c3e50;">Год выпуска:</td>
+                        <td>
+                            <span class="badge" style="background-color: #9b59b6;">
+                                {{ product.production_year }}
+                            </span>
+                        </td>
                     </tr>
                     <tr>
-                        <td><strong>Категория:</strong></td>
-                        <td>{{ product.category.name }}</td>
+                        <td class="fw-bold" style="color: #2c3e50;">Категория:</td>
+                        <td>
+                            <span class="badge" style="background-color: #e74c3c;">
+                                {{ product.category.name }}
+                            </span>
+                        </td>
                     </tr>
                 </table>
                 <div class="mt-3">
-                    <h6>Дополнительные характеристики:</h6>
-                    <p class="text-muted">{{ product.characteristics }}</p>
+                    <h6 class="fw-bold" style="color: #2c3e50;"> Дополнительные характеристики:</h6>
+                    <p class="text-muted">{{ product.characteristics|linebreaks }}</p>
                 </div>
             </div>
         </div>
 
-        <!-- Кнопка корзины -->
+        <!-- Кнопки действий -->
         <div class="d-grid gap-2">
-            <button class="btn btn-primary btn-lg py-3">
-                🛒 Добавить в корзину
-            </button>
-            <a href="{% url 'catalog' %}" class="btn btn-outline-secondary">
+<form method="post" action="{% url 'add_to_cart' product.id %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-lg py-3 fw-bold border-0 w-100" 
+            style="background-color: #e74c3c; color: white; font-size: 1.2rem;">
+         Добавить в корзину
+    </button>
+</form>
+            <a href="{% url 'catalog' %}" class="btn btn-outline-secondary py-2 fw-bold">
                 ← Вернуться в каталог
             </a>
         </div>
     </div>
 </div>
 
-<!-- Похожие товары -->
-<div class="row mt-5">
-    <div class="col-12">
-        <h3> Похожие товары</h3>
-        <div class="row">
-            <!-- Здесь можно добавить похожие товары из той же категории -->
-            <div class="col-12 text-center">
-                <p class="text-muted">Функция похожих товаров будет добавлена позже</p>
-            </div>
-        </div>
-    </div>
-</div>
+
+<style>
+.btn:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease;
+}
+.breadcrumb {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+}
+.breadcrumb-item.active {
+    color: #2c3e50;
+    font-weight: bold;
+}
+.card {
+    border-radius: 15px;
+}
+</style>
 {% endblock %}

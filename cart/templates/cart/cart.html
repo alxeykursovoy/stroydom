@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold" style="color: #2c3e50;"> Корзина покупок</h1>
+            <div class="d-flex align-items-center">
+                <span class="badge me-3 fs-6" style="background-color: #e74c3c;">
+                    Товаров: {{ cart.total_quantity }}
+                </span>
+            </div>
+        </div>
+
+        {% if cart.items.count > 0 %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                {% for item in cart.items.all %}
+                <div class="row align-items-center p-4 border-bottom" id="cart-item-{{ item.id }}">
+                    <div class="col-md-2">
+                        {% if item.product.image %}
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" 
+                             class="img-fluid rounded" style="height: 100px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                             style="height: 100px;">                            
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <h5 class="fw-bold mb-1" style="color: #2c3e50;">{{ item.product.name }}</h5>
+                        <p class="text-muted small mb-0">{{ item.product.category.name }}</p>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <span class="h5 fw-bold" style="color: #e74c3c;">{{ item.product.price }} ₽</span>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-outline-secondary btn-sm quantity-btn" 
+                                    data-action="decrease" data-item-id="{{ item.id }}">
+                                -
+                            </button>
+                            <span class="mx-3 fw-bold fs-5" id="quantity-{{ item.id }}">
+                                {{ item.quantity }}
+                            </span>
+                            <button class="btn btn-outline-secondary btn-sm quantity-btn" 
+                                    data-action="increase" data-item-id="{{ item.id }}">
+                                +
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-2 text-end">
+                        <span class="h5 fw-bold" style="color: #2c3e50;" id="total-{{ item.id }}">
+                            {{ item.total_price }} ₽
+                        </span>
+                        <br>
+                        <button class="btn btn-danger btn-sm mt-1 remove-btn" 
+                                data-item-id="{{ item.id }}">
+                             Удалить
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <div class="p-4 bg-light">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h4 class="fw-bold mb-0" style="color: #2c3e50;">Общая сумма:</h4>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <h2 class="fw-bold" style="color: #e74c3c;" id="cart-total">
+                                {{ cart.total_price }} ₽
+                            </h2>
+                            <a href="{% url 'checkout' %}" class="btn btn-lg w-100 mt-3 fw-bold border-0"
+                               style="background-color: #e74c3c; color: white;">
+                                 Оформить заказ
+                            </a>
+                            <a href="{% url 'catalog' %}" class="btn btn-outline-secondary w-100 mt-2">
+                                 Продолжить покупки
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card border-0 shadow-sm text-center py-5">
+            <div class="card-body">
+                <h2 class="fw-bold mb-3" style="color: #2c3e50;"> Корзина пуста</h2>
+                <p class="text-muted mb-4">Добавьте товары из каталога, чтобы сделать заказ</p>
+                <a href="{% url 'catalog' %}" class="btn btn-lg fw-bold border-0"
+                   style="background-color: #e74c3c; color: white; padding: 12px 30px;">
+                     Перейти в каталог
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Обработка изменения количества
+    document.querySelectorAll('.quantity-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const itemId = this.dataset.itemId;
+            const action = this.dataset.action;
+            
+            fetch(`/cart/update/${itemId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=${action}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.removed) {
+                        document.getElementById(`cart-item-${itemId}`).remove();
+                    } else {
+                        document.getElementById(`quantity-${itemId}`).textContent = data.quantity;
+                        document.getElementById(`total-${itemId}`).textContent = data.item_total + ' ₽';
+                        document.getElementById('cart-total').textContent = data.cart_total + ' ₽';
+                        
+                        // Обновляем бейдж количества товаров
+                        document.querySelector('.badge:first-child').textContent = 'Товаров: ' + data.cart_quantity;
+                    }
+                    
+                    // Если корзина пуста, перезагружаем страницу
+                    if (data.cart_quantity === 0) {
+                        location.reload();
+                    }
+                }
+            });
+        });
+    });
+    
+    // Обработка удаления товара
+    document.querySelectorAll('.remove-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const itemId = this.dataset.itemId;
+            
+            fetch(`/cart/update/${itemId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'action=remove'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(`cart-item-${itemId}`).remove();
+                    document.getElementById('cart-total').textContent = data.cart_total + ' ₽';
+                    
+                    // Обновляем бейдж количества товаров
+                    document.querySelector('.badge:first-child').textContent = 'Товаров: ' + data.cart_quantity;
+                    
+                    // Если корзина пуста, перезагружаем страницу
+                    if (data.cart_quantity === 0) {
+                        location.reload();
+                    }
+                }
+            });
+        });
+    });
+});
+</script>
+
+<style>
+.quantity-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+.card {
+    border-radius: 15px;
+}
+.btn {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+.btn:hover {
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}
