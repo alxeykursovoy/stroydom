@@ -102,6 +102,13 @@
                                 {% endfor %}
                             </div>
                             
+                            <!-- Причина отказа -->
+                            {% if order.status == 'cancelled' and order.cancel_reason %}
+                            <div class="alert alert-danger mt-2 mb-3">
+                                <strong>Причина отказа:</strong> {{ order.cancel_reason }}
+                            </div>
+                            {% endif %}
+                            
                             <!-- Действия -->
                             <div class="d-flex justify-content-between align-items-center">
                                 <small class="text-muted">

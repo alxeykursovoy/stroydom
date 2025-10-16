@@ -1,0 +1,28 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block after_field_sets %}
+<div class="card mt-4">
+    <div class="card-header">
+        <h5> Быстрые действия</h5>
+    </div>
+    <div class="card-body">
+        <div class="d-flex gap-2">
+            {% if original.status == 'new' %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" name="_confirm" class="btn btn-success">
+                     Подтвердить заказ
+                </button>
+            </form>
+            {% endif %}
+            
+            {% if original.status != 'cancelled' %}
+            <a href="{% url 'admin:cart_order_changelist' %}" class="btn btn-secondary">
+                 К списку заказов
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

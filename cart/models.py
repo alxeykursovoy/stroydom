@@ -35,6 +35,7 @@ class CartItem(models.Model):
 
     def total_price(self):
         return self.product.price * self.quantity
+
 class Order(models.Model):
     STATUS_CHOICES = [
         ('new', 'Новый'),
@@ -49,6 +50,7 @@ class Order(models.Model):
     updated = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new', verbose_name='Статус')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Общая сумма')
+    cancel_reason = models.TextField(blank=True, verbose_name='Причина отказа')
 
     class Meta:
         verbose_name = 'Заказ'
@@ -57,6 +59,9 @@ class Order(models.Model):
 
     def __str__(self):
         return f'Заказ #{self.id} - {self.user.username}'
+
+    def total_quantity(self):
+        return sum(item.quantity for item in self.items.all())
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE, verbose_name='Заказ')
@@ -72,4 +77,4 @@ class OrderItem(models.Model):
         return f'{self.quantity} x {self.product.name}'
 
     def total_price(self):
-        return self.price * self.quantity    
+        return self.price * self.quantity
