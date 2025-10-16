@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded shadow" style="max-height: 500px; width: 100%; object-fit: cover;">
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'catalog' %}">Каталог</a></li>
+                <li class="breadcrumb-item active">{{ product.name }}</li>
+            </ol>
+        </nav>
+
+        <h1 class="display-5">{{ product.name }}</h1>
+        <p class="lead">{{ product.description }}</p>
+        
+        <div class="mb-4">
+            <span class="h2 text-primary">{{ product.price }} ₽</span>
+            <span class="badge bg-success fs-6 ms-2">В наличии</span>
+        </div>
+
+        <!-- Характеристики -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">📋 Характеристики</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong>Модель:</strong></td>
+                        <td>{{ product.model }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Страна-производитель:</strong></td>
+                        <td>{{ product.get_country_display }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Год выпуска:</strong></td>
+                        <td>{{ product.production_year }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Категория:</strong></td>
+                        <td>{{ product.category.name }}</td>
+                    </tr>
+                </table>
+                <div class="mt-3">
+                    <h6>Дополнительные характеристики:</h6>
+                    <p class="text-muted">{{ product.characteristics }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Кнопка корзины -->
+        <div class="d-grid gap-2">
+            <button class="btn btn-primary btn-lg py-3">
+                🛒 Добавить в корзину
+            </button>
+            <a href="{% url 'catalog' %}" class="btn btn-outline-secondary">
+                ← Вернуться в каталог
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Похожие товары -->
+<div class="row mt-5">
+    <div class="col-12">
+        <h3> Похожие товары</h3>
+        <div class="row">
+            <!-- Здесь можно добавить похожие товары из той же категории -->
+            <div class="col-12 text-center">
+                <p class="text-muted">Функция похожих товаров будет добавлена позже</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

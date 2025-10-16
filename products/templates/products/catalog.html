@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <!-- Фильтры -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"> Фильтры</h5>
+            </div>
+            <div class="card-body">
+                <h6>Категории</h6>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'catalog' %}" 
+                       class="list-group-item list-group-item-action {% if not current_category %}active{% endif %}">
+                        Все товары
+                    </a>
+                    {% for category in categories %}
+                    <a href="{{ category.get_absolute_url }}" 
+                       class="list-group-item list-group-item-action {% if current_category == category.slug %}active{% endif %}">
+                        {{ category.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Сортировка -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"> Сортировка</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <a href="?sort=newest{% if current_category %}&category={{ current_category }}{% endif %}" 
+                       class="list-group-item list-group-item-action {% if current_sort == 'newest' %}active{% endif %}">
+                         По новизне
+                    </a>
+                    <a href="?sort=name{% if current_category %}&category={{ current_category }}{% endif %}" 
+                       class="list-group-item list-group-item-action {% if current_sort == 'name' %}active{% endif %}">
+                         По названию
+                    </a>
+                    <a href="?sort=price_asc{% if current_category %}&category={{ current_category }}{% endif %}" 
+                       class="list-group-item list-group-item-action {% if current_sort == 'price_asc' %}active{% endif %}">
+                         По цене (возр.)
+                    </a>
+                    <a href="?sort=price_desc{% if current_category %}&category={{ current_category }}{% endif %}" 
+                       class="list-group-item list-group-item-action {% if current_sort == 'price_desc' %}active{% endif %}">
+                         По цене (убыв.)
+                    </a>
+                    <a href="?sort=year{% if current_category %}&category={{ current_category }}{% endif %}" 
+                       class="list-group-item list-group-item-action {% if current_sort == 'year' %}active{% endif %}">
+                         По году выпуска
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <!-- Заголовок и количество товаров -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1> Каталог домов и бань</h1>
+            <span class="badge bg-primary fs-6">Товаров: {{ products|length }}</span>
+        </div>
+
+        <!-- Сетка товаров -->
+        <div class="row">
+            {% for product in products %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 shadow-sm product-card">
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-muted small">{{ product.description|truncatewords:15 }}</p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="h5 text-primary mb-0">{{ product.price }} ₽</span>
+                                <span class="badge bg-success">В наличии</span>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted"> {{ product.production_year }} •  {{ product.model }}</small>
+                            </div>
+                            <a href="{{ product.get_absolute_url }}" class="btn btn-primary w-100 mt-2">
+                                Подробнее
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <h4> Товары не найдены</h4>
+                    <p>Попробуйте изменить параметры фильтрации</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+.product-card {
+    transition: transform 0.2s;
+    border: none;
+    border-radius: 15px;
+}
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+.list-group-item.active {
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+}
+</style>
+{% endblock %}
