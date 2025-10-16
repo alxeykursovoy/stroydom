@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card border-0 shadow-lg">
+            <div class="card-header text-white" style="background-color: #2c3e50;">
+                <h3 class="text-center mb-0">Регистрация</h3>
+            </div>
+            <div class="card-body p-4">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" id="registerForm">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="id_surname" class="form-label fw-bold">Фамилия *</label>
+                            <input type="text" name="surname" class="form-control" id="id_surname" 
+                                   placeholder="Иванов" required>
+                            <div class="form-text small">Кириллица, пробелы, тире</div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="id_name" class="form-label fw-bold">Имя *</label>
+                            <input type="text" name="name" class="form-control" id="id_name" 
+                                   placeholder="Иван" required>
+                            <div class="form-text small">Кириллица, пробелы, тире</div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="id_patronymic" class="form-label fw-bold">Отчество</label>
+                            <input type="text" name="patronymic" class="form-control" id="id_patronymic" 
+                                   placeholder="Иванович">
+                            <div class="form-text small">Кириллица, пробелы, тире</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_login" class="form-label fw-bold">Логин *</label>
+                        <input type="text" name="login" class="form-control" id="id_login" 
+                               placeholder="ivanov2024" required>
+                        <div class="form-text small">Латиница, цифры, тире</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label fw-bold">Email *</label>
+                        <input type="email" name="email" class="form-control" id="id_email" 
+                               placeholder="ivanov@example.com" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_password" class="form-label fw-bold">Пароль *</label>
+                            <input type="password" name="password" class="form-control" id="id_password" 
+                                   placeholder="Не менее 6 символов" required minlength="6">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="id_password_repeat" class="form-label fw-bold">Повторите пароль *</label>
+                            <input type="password" name="password_repeat" class="form-control" id="id_password_repeat" 
+                                   placeholder="Повторите пароль" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input type="checkbox" name="rules" class="form-check-input" id="id_rules" required>
+                            <label class="form-check-label fw-bold" for="id_rules">
+                                Я согласен с <a href="#" class="text-decoration-none" style="color: #e74c3c;">правилами регистрации</a> *
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn w-100 py-2 fw-bold" 
+                            style="background-color: #e74c3c; color: white; font-size: 1.1rem;">
+                        Создать аккаунт
+                    </button>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <p class="text-muted">Уже есть аккаунт? 
+                        <a href="/auth/login/" class="text-decoration-none fw-bold" style="color: #e74c3c;">
+                            Войдите в систему
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control:focus {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+}
+.form-check-input:checked {
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+}
+</style>
+{% endblock %}
