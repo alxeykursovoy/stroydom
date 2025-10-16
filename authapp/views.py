@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
-import re
+from django.contrib.auth.decorators import login_required
+from cart.models import Order
 
 def register_view(request):
     if request.method == 'POST':
@@ -108,3 +109,24 @@ def logout_view(request):
     logout(request)
     messages.success(request, 'Вы успешно вышли из системы')
     return redirect('/')
+
+@login_required
+def profile_view(request):
+    orders = Order.objects.filter(user=request.user).prefetch_related('items')
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'authapp/profile.html', context)
+
+@login_required
+def delete_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    
+    # Разрешаем удалять только новые заказы
+    if order.status == 'new':
+        order.delete()
+        messages.success(request, f'Заказ #{order_id} успешно удален.')
+    else:
+        messages.error(request, 'Можно удалять только новые заказы.')
+    
+    return redirect('profile')

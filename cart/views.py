@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate
 from django.contrib import messages
 from django.http import JsonResponse
 from .models import Cart, CartItem
+from .models import Order, OrderItem
 from products.models import Product
 from .forms import OrderForm
 
@@ -77,13 +78,26 @@ def checkout_view(request):
             user = authenticate(username=request.user.username, password=password)
             
             if user is not None:
-                # Здесь будет логика создания заказа
-                messages.success(request, 'Заказ успешно оформлен! С вами свяжутся для уточнения деталей.')
+                # Создаем заказ
+                order = Order.objects.create(
+                    user=request.user,
+                    total_price=cart.total_price()
+                )
                 
-                # Очищаем корзину после оформления заказа
+                # Создаем элементы заказа
+                for cart_item in cart.items.all():
+                    OrderItem.objects.create(
+                        order=order,
+                        product=cart_item.product,
+                        quantity=cart_item.quantity,
+                        price=cart_item.product.price
+                    )
+                
+                # Очищаем корзину
                 cart.items.all().delete()
                 
-                return redirect('home')
+                messages.success(request, f'Заказ #{order.id} успешно оформлен! С вами свяжутся для уточнения деталей.')
+                return redirect('profile')
             else:
                 messages.error(request, 'Неверный пароль! Пожалуйста, попробуйте снова.')
     else:

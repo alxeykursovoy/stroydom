@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <!-- Информация пользователя -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header text-white" style="background-color: #2c3e50;">
+                <h5 class="mb-0"> Личный кабинет</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" 
+                         style="width: 80px; height: 80px;">
+                        <span class="text-white fs-2">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+                    </div>
+                    <h4 class="mt-3 fw-bold" style="color: #2c3e50;">
+                        {{ user.first_name }} {{ user.last_name }}
+                    </h4>
+                    <p class="text-muted">{{ user.email }}</p>
+                </div>
+                
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Всего заказов:</span>
+                        <span class="badge" style="background-color: #e74c3c;">{{ orders|length }}</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Активные заказы:</span>
+                        <span class="badge" style="background-color: #27ae60;">
+                            {{ orders|length }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Быстрые действия -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header text-white" style="background-color: #2c3e50;">
+                <h5 class="mb-0"> Быстрые действия</h5>
+            </div>
+            <div class="card-body">
+                <a href="{% url 'catalog' %}" class="btn w-100 mb-2 fw-bold border-0"
+                   style="background-color: #e74c3c; color: white;">
+                     Продолжить покупки
+                </a>
+                <a href="{% url 'logout' %}" class="btn btn-outline-secondary w-100">
+                     Выйти из системы
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <!-- История заказов -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header text-white d-flex justify-content-between align-items-center" 
+                 style="background-color: #2c3e50;">
+                <h5 class="mb-0"> История заказов</h5>
+                <span class="badge bg-light text-dark">{{ orders|length }} заказ(ов)</span>
+            </div>
+            <div class="card-body">
+                {% if orders %}
+                    {% for order in orders %}
+                    <div class="card mb-3 border-0" style="background-color: #f8f9fa;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h6 class="fw-bold mb-1" style="color: #2c3e50;">
+                                        Заказ #{{ order.id }}
+                                    </h6>
+                                    <small class="text-muted">
+                                         {{ order.created|date:"d.m.Y H:i" }}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge 
+                                        {% if order.status == 'new' %}bg-success
+                                        {% elif order.status == 'processing' %}bg-warning
+                                        {% elif order.status == 'shipped' %}bg-info
+                                        {% elif order.status == 'delivered' %}bg-primary
+                                        {% else %}bg-secondary{% endif %}">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                    <h5 class="mt-2 fw-bold" style="color: #e74c3c;">
+                                        {{ order.total_price }} ₽
+                                    </h5>
+                                </div>
+                            </div>
+                            
+                            <!-- Товары в заказе -->
+                            <div class="mb-3">
+                                {% for item in order.items.all %}
+                                <div class="d-flex justify-content-between align-items-center py-1">
+                                    <span>
+                                        {{ item.product.name }} 
+                                        <small class="text-muted">× {{ item.quantity }}</small>
+                                    </span>
+                                    <span class="fw-bold">{{ item.total_price }} ₽</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Действия -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                     Обновлено: {{ order.updated|date:"d.m.Y H:i" }}
+                                </small>
+                                {% if order.status == 'new' %}
+                                <form method="post" action="{% url 'delete_order' order.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm" 
+                                            onclick="return confirm('Вы уверены, что хотите удалить этот заказ?')">
+                                         Удалить заказ
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="text-muted small">Заказ нельзя удалить</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="text-center py-5">
+                    <h4 class="fw-bold mb-3" style="color: #2c3e50;"> Заказов пока нет</h4>
+                    <p class="text-muted mb-4">Сделайте свой первый заказ в нашем каталоге!</p>
+                    <a href="{% url 'catalog' %}" class="btn fw-bold border-0"
+                       style="background-color: #e74c3c; color: white; padding: 12px 30px;">
+                         Перейти в каталог
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border-radius: 15px;
+}
+.btn {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+.btn:hover {
+    transform: translateY(-2px);
+}
+.badge {
+    border-radius: 10px;
+    padding: 8px 12px;
+}
+</style>
+{% endblock %}

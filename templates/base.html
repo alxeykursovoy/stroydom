@@ -130,6 +130,11 @@
         {% endif %}
     </a>
 </li>
+{% if user.is_authenticated %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'profile' %}"> Личный кабинет</a>
+</li>
+{% endif %}
                 </ul>
                 
                 <div class="navbar-nav">
